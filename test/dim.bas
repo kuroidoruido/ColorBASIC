@@ -1,0 +1,2 @@
+DIM text AS STRING
+DIM x AS DOUBLE

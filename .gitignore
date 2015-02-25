@@ -1,0 +1,7 @@
+src/*.cmo
+src/*.cmi
+src/*.mli
+src/colorbasic
+src/lexer.ml
+src/parser.ml
+*.c

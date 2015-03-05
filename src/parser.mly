@@ -21,15 +21,15 @@ main:
 
 lines:
     /* empty */ {}
-  | lines line EOL {print_string ("\t"^$2^"\n")}
+  | lines line {print_string ("\t"^$2)}
 ;
 
 line:
-	| {""}
-	| PRINT QUOTED_STRING {"printf(" ^ $2 ^ ");"}
-	/*| PRINT (STRING NUMBER)+ {print_string ("printf(" ^ $2 ^ ");\n")}*/
-	| SLEEP {"getchar();"}
-	| LOCATE NUMBER COMA NUMBER {"system(\"tput cup " ^ $2 ^ " " ^ $4 ^"\");"}
+	| EOL{"\n"}
+	| PRINT QUOTED_STRING EOL {"printf(" ^ $2 ^ ");\n"}
+	/*| PRINT (STRING NUMBER)+ EOL {print_string ("printf(" ^ $2 ^ ");\n")}*/
+	| SLEEP EOL {"getchar();\n"}
+	| LOCATE NUMBER COMA NUMBER EOL {"system(\"tput cup " ^ $2 ^ " " ^ $4 ^"\");\n"}
 
 includes:
 	| {print_string "#include <stdlib.h>\n\n"}

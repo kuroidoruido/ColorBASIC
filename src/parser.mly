@@ -6,6 +6,7 @@
 %token <char> CHAR
 %token <string> NUMBER
 %token <string> QUOTED_STRING
+%token <string> COMMENT, COMMENT_MULTI
 
 %token LOCATE
 %token PRINT
@@ -16,20 +17,27 @@
 %%
 
 main:
-   includes headers lines footers EOF {}
+   includes headers insts footers EOF {}
 ;
 
-lines:
+insts:
     /* empty */ {}
-  | lines line {print_string ("\t"^$2)}
+  | insts inst {print_string ("\t"^$2)}
 ;
 
-line:
-	| EOL{"\n"}
-	| PRINT QUOTED_STRING EOL {"printf(" ^ $2 ^ ");\n"}
-	/*| PRINT (STRING NUMBER)+ EOL {print_string ("printf(" ^ $2 ^ ");\n")}*/
-	| SLEEP EOL {"getchar();\n"}
-	| LOCATE NUMBER COMA NUMBER EOL {"system(\"tput cup " ^ $2 ^ " " ^ $4 ^"\");\n"}
+inst:
+	| end_of_line {$1}
+	| PRINT QUOTED_STRING end_of_line {"printf(" ^ $2 ^ ");"^$3}
+	
+	| SLEEP end_of_line {"getchar();\n"}
+	| LOCATE NUMBER COMA NUMBER end_of_line {"system(\"tput cup " ^ $2 ^ " " ^ $4 ^"\");\n"}
+	| COMMENT EOL {"//"^$1^"\n"}
+	| COMMENT_MULTI EOL {"/*"^$1^"*/\n"}
+
+end_of_line:
+	| EOL {"\n"}
+	| COMMENT EOL {"// "^$1^"\n"}
+	| COMMENT_MULTI EOL {"/* "^$1^"*/\n"}
 
 includes:
 	| {print_string "#include <stdlib.h>\n\n"}

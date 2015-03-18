@@ -1,0 +1,7 @@
+SCREEN 13
+LINE (1,1)-(100,100),1,bf
+PRINT "Hello World!"
+CIRCLE (10,10),10,2
+PSET (30,15),3
+
+SLEEP

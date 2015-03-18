@@ -29,6 +29,8 @@ test:
 	@echo
 	./$(EXEC) ../test/sleep.bas
 	@echo
+	./$(EXEC) ../test/comment.bas
+	@echo
 clean:
 	rm -f *.cm[iox] *.mli *~ .*~
 	rm -rf lexer.ml parser.ml

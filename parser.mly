@@ -1,5 +1,5 @@
 %{
-exception AlreadyDefined of string;;
+exception VariableException of string;;
 let var_list :(string,string) Hashtbl.t = Hashtbl.create 10
 (*
 Hashtbl.add var_list key value
@@ -14,10 +14,12 @@ let dim_to_c_declaration basicType varName =
 ;;
 
 let printf_var varName =
-	match Hashtbl.find var_list varName with
-	| "int" -> ("\"%d\","^varName)
-	| "string" ->("\"%s\","^varName)
-	| _ -> failwith varName
+	let local varName =
+		match Hashtbl.find var_list varName with
+		| "int" -> ("\"%d\","^varName)
+		| "string" ->("\"%s\","^varName)
+		| _ -> failwith varName
+	in "printf("^(local varName)^");"
 ;;
 %}
 
@@ -55,9 +57,19 @@ insts:
 inst:
 	| end_of_line {$1}
 	| PRINT print_simple_arg end_of_line {"printf(" ^ $2 ^ ");"^$3}
+	| PRINT VAR_NAME end_of_line {
+		if Hashtbl.mem var_list $2
+		then (printf_var $2)^$3
+		else raise (VariableException "No previous declaration of this variable")
+		}
 	| SLEEP end_of_line {"getchar();\n"}
 	| LOCATE NUMBER COMA NUMBER end_of_line {"system(\"tput cup " ^ $2 ^ " " ^ $4 ^"\");\n"}
-	| DIM VAR_NAME AS datatype end_of_line {if Hashtbl.mem var_list $2 then raise (AlreadyDefined "This variable name was already used to defined another variable") else Hashtbl.add var_list $2 $4;(dim_to_c_declaration $4 $2)^$5}
+	| DIM VAR_NAME AS datatype end_of_line {
+		if Hashtbl.mem var_list $2
+		then raise (VariableException "This variable name was already used to defined another variable")
+		else Hashtbl.add var_list $2 $4;
+		(dim_to_c_declaration $4 $2)^$5
+		}
 
 print_simple_arg:
 	| QUOTED_STRING {$1}

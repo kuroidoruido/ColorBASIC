@@ -1,4 +1,5 @@
 %{
+exception AlreadyDefined of string;;
 let var_list :(string,string) Hashtbl.t = Hashtbl.create 10
 (*
 Hashtbl.add var_list key value
@@ -7,8 +8,8 @@ Hashtbl.find var_list key
 
 let dim_to_c_declaration basicType varName =
 	match basicType with
-	| "int"	-> ("int "^varName^";\n")
-	| "string"	-> ("char* "^varName^";\n")
+	| "int"	-> ("int "^varName^";")
+	| "string"	-> ("char* "^varName^";")
 	| _ -> failwith basicType
 ;;
 
@@ -53,14 +54,15 @@ insts:
 
 inst:
 	| end_of_line {$1}
-	| COMMENT EOL {"//"^$1^"\n"}
-	| COMMENT_MULTI EOL {"/*"^$1^"*/\n"}
-	| PRINT QUOTED_STRING end_of_line {"printf(" ^ $2 ^ ");"^$3}
-	| PRINT NUMBER end_of_line {"printf(" ^ $2 ^ ");"^$3}
+	| PRINT print_simple_arg end_of_line {"printf(" ^ $2 ^ ");"^$3}
 	| SLEEP end_of_line {"getchar();\n"}
 	| LOCATE NUMBER COMA NUMBER end_of_line {"system(\"tput cup " ^ $2 ^ " " ^ $4 ^"\");\n"}
-	| DIM VAR_NAME AS datatype end_of_line {Hashtbl.add var_list $2 $4;dim_to_c_declaration $4 $2}
-	
+	| DIM VAR_NAME AS datatype end_of_line {if Hashtbl.mem var_list $2 then raise (AlreadyDefined "This variable name was already used to defined another variable") else Hashtbl.add var_list $2 $4;(dim_to_c_declaration $4 $2)^$5}
+
+print_simple_arg:
+	| QUOTED_STRING {$1}
+	| NUMBER {$1}
+
 datatype:
 	| T_STRING {"string"}
 	| T_INTEGER {"int"}

@@ -11,7 +11,7 @@ all: clean compile
 
 compile:
 	$(CAMLLEX) lexer.mll
-	$(CAMLYACC) parser.mly
+	$(CAMLYACC) -v parser.mly
 	$(CAMLC) -c parser.mli
 	$(CAMLC) -c parser.ml
 	$(CAMLC) -c lexer.ml

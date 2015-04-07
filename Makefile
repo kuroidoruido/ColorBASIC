@@ -5,7 +5,7 @@ CAMLDEP = ocamldep
 CAMLLEX = ocamllex
 CAMLYACC = ocamlyacc
 
-TESTS:=$(wildcard ../test/*.bas)
+TESTS:=$(wildcard test/*.bas)
 
 all: clean compile
 
@@ -17,16 +17,16 @@ compile:
 	$(CAMLC) -c lexer.ml
 	$(CAMLC) *.cmo main.ml -o $(EXEC)
 
-test: 
-	./$(EXEC) ../test/print.bas
+test: all
+	./$(EXEC) test/print.bas
 	@echo
-	./$(EXEC) ../test/two_print.bas
+	./$(EXEC) test/two_print.bas
 	@echo
-	./$(EXEC) ../test/locate.bas
+	./$(EXEC) test/locate.bas
 	@echo
-	./$(EXEC) ../test/sleep.bas
+	./$(EXEC) test/sleep.bas
 	@echo
-	./$(EXEC) ../test/comment.bas
+	./$(EXEC) test/comment.bas
 	@echo
 clean:
 	rm -f *.cm[iox] *.mli *~ .*~

@@ -10,6 +10,7 @@ let coma = ','
 
 let string = '"' [^'"']* '"'
 let number = ['0'-'9']+('.'['0'-'9']+)?
+let var_name = ['a'-'z''A'-'Z'](['a'-'z''A'-'Z''0'-'9''_']*)
 
 rule main = parse
 (* basic elements *)
@@ -17,10 +18,9 @@ rule main = parse
 	| eol			{EOL}
 	| coma			{COMA}
 	| whitespace	{main lexbuf}
-	
-	| string as s 	{QUOTED_STRING s}
-	| number as n 	{NUMBER n}
-
+(* datatypes *)
+	| "String"		{T_STRING}
+	| "Integer"		{T_INTEGER}
 (* comments *)
 	| "'" [^'\n']* as c {COMMENT (String.sub c 1 ((String.length c) - 1))}
 	|  "REM" [^'\n']* as c {COMMENT (String.sub c 3 ((String.length c) - 3))}
@@ -29,7 +29,13 @@ rule main = parse
 	| "LOCATE" {LOCATE}
 	| "PRINT" {PRINT}
 	| "SLEEP" {SLEEP}
-
+	| "DIM" {DIM}
+	| "AS" {AS}
+	
+	| var_name as v	{VAR_NAME v}
+	| string as s 	{QUOTED_STRING s}
+	| number as n 	{NUMBER n}
+	
 	| _ as c {CHAR c}
 
 and comment_multi = parse

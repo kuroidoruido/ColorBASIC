@@ -19,15 +19,18 @@ compile:
 
 test: all
 	./$(EXEC) test/print.bas
-	@echo
+	@echo -e "\n"
 	./$(EXEC) test/two_print.bas
-	@echo
+	@echo -e "\n"
 	./$(EXEC) test/locate.bas
-	@echo
+	@echo -e "\n"
 	./$(EXEC) test/sleep.bas
-	@echo
+	@echo -e "\n"
 	./$(EXEC) test/comment.bas
-	@echo
+	@echo -e "\n"
+	./$(EXEC) test/dim.bas
+	@echo -e "\n"
+
 clean:
 	rm -f *.cm[iox] *.mli *~ .*~
 	rm -rf lexer.ml parser.ml

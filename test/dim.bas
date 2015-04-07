@@ -1,2 +1,2 @@
-DIM text AS STRING
-DIM x AS DOUBLE
+DIM text AS String
+DIM Z AS Integer

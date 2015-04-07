@@ -22,9 +22,6 @@ rule main = parse
 	| number as n 	{NUMBER n}
 
 (* comments *)
-(*
-	| comment as c {COMMENT c}
-*)
 	| "'" [^'\n']* as c {COMMENT (String.sub c 1 ((String.length c) - 1))}
 	|  "REM" [^'\n']* as c {COMMENT (String.sub c 3 ((String.length c) - 3))}
 	| "/'" {comment_buffer := "";COMMENT_MULTI (comment_multi lexbuf)}

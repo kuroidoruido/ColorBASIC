@@ -1,3 +1,24 @@
+%{
+let var_list :(string,string) Hashtbl.t = Hashtbl.create 10
+(*
+Hashtbl.add var_list key value
+Hashtbl.find var_list key
+*)
+
+let dim_to_c_declaration basicType varName =
+	match basicType with
+	| "int"	-> ("int "^varName^";\n")
+	| "string"	-> ("char* "^varName^";\n")
+	| _ -> failwith basicType
+;;
+
+let printf_var varName =
+	match Hashtbl.find var_list varName with
+	| "int" -> ("\"%d\","^varName)
+	| "string" ->("\"%s\","^varName)
+	| _ -> failwith varName
+;;
+%}
 
 %token COMA
 %token EOF
@@ -27,12 +48,13 @@ insts:
 
 inst:
 	| end_of_line {$1}
+	| COMMENT EOL {"//"^$1^"\n"}
+	| COMMENT_MULTI EOL {"/*"^$1^"*/\n"}
 	| PRINT QUOTED_STRING end_of_line {"printf(" ^ $2 ^ ");"^$3}
+	| PRINT NUMBER end_of_line {"printf(" ^ $2 ^ ");"^$3}
 	
 	| SLEEP end_of_line {"getchar();\n"}
 	| LOCATE NUMBER COMA NUMBER end_of_line {"system(\"tput cup " ^ $2 ^ " " ^ $4 ^"\");\n"}
-	| COMMENT EOL {"//"^$1^"\n"}
-	| COMMENT_MULTI EOL {"/*"^$1^"*/\n"}
 
 end_of_line:
 	| EOL {"\n"}

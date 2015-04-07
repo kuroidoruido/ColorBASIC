@@ -10,7 +10,6 @@ TESTS:=$(wildcard ../test/*.bas)
 all: clean compile
 
 compile:
-#~ 	$(CAMLC) -c printer.ml
 	$(CAMLLEX) lexer.mll
 	$(CAMLYACC) parser.mly
 	$(CAMLC) -c parser.mli
@@ -23,8 +22,6 @@ test:
 	@echo
 	./$(EXEC) ../test/two_print.bas
 	@echo
-#~ 	./$(EXEC) ../test/print_multi_args.bas
-#~ 	@echo
 	./$(EXEC) ../test/locate.bas
 	@echo
 	./$(EXEC) ../test/sleep.bas

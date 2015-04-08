@@ -25,6 +25,14 @@ rule main = parse
 	| "'" [^'\n']* as c {COMMENT (String.sub c 1 ((String.length c) - 1))}
 	|  "REM" [^'\n']* as c {COMMENT (String.sub c 3 ((String.length c) - 3))}
 	| "/'" {comment_buffer := "";COMMENT_MULTI (comment_multi lexbuf)}
+(* operators *)
+	| '=' {OP_EQ}
+	| '+' {OP_ADD}
+	| '-' {OP_MIN}
+	| '*' {OP_MUL}
+	| '/' {OP_DIV}
+	| '(' {OP_L_BRACKET}
+	| ')' {OP_R_BRACKET}
 (* instructions *)
 	| "LOCATE" {LOCATE}
 	| "PRINT" {PRINT}

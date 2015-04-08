@@ -33,6 +33,9 @@ let printf_var varName =
 %token <string> VAR_NAME
 %token <string> COMMENT, COMMENT_MULTI
 
+%token OP_EQ, OP_ADD, OP_MIN, OP_MUL, OP_DIV
+%token OP_L_BRACKET, OP_R_BRACKET
+
 %token LOCATE
 %token PRINT
 %token SLEEP
@@ -66,14 +69,31 @@ inst:
 	| LOCATE NUMBER COMA NUMBER end_of_line {"system(\"tput cup " ^ $2 ^ " " ^ $4 ^"\");\n"}
 	| DIM VAR_NAME AS datatype end_of_line {
 		if Hashtbl.mem var_list $2
-		then raise (VariableException "This variable name was already used to defined another variable")
+		then
+			raise (VariableException "This variable name was already used to defined another variable")
 		else Hashtbl.add var_list $2 $4;
-		(dim_to_c_declaration $4 $2)^$5
+			(dim_to_c_declaration $4 $2)^$5
+		}
+	| VAR_NAME OP_EQ expression {
+			$1^"="^$3
 		}
 
 print_simple_arg:
 	| QUOTED_STRING {$1}
 	| NUMBER {$1}
+
+expression:
+	| NUMBER {$1}
+	| OP_MIN NUMBER {"-"^$2}
+	| OP_L_BRACKET expression OP_R_BRACKET {"("^$2^")"}
+	| OP_L_BRACKET expression OP_R_BRACKET operators expression {"("^$2^")"^$4^$5}
+	| NUMBER operators expression {$1^$2^$3}
+
+operators:
+	| OP_ADD		{"+"}
+	| OP_MIN		{"-"}
+	| OP_MUL		{"*"}
+	| OP_DIV		{"/"}
 
 datatype:
 	| T_STRING {"string"}

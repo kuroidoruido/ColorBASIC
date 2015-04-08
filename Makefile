@@ -30,6 +30,8 @@ test: all
 	@echo -e "\n"
 	./$(EXEC) test/dim.bas
 	@echo -e "\n"
+	./$(EXEC) test/if.bas
+	@echo -e "\n"
 
 clean:
 	rm -f *.cm[iox] *.mli *~ .*~

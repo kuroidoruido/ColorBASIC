@@ -26,23 +26,33 @@ rule main = parse
 	|  "REM" [^'\n']* as c {COMMENT (String.sub c 3 ((String.length c) - 3))}
 	| "/'" {comment_buffer := "";COMMENT_MULTI (comment_multi lexbuf)}
 (* operators *)
-	| '=' {OP_EQ}
+	| '=' {print_string ">EQ<";OP_EQ}
 	| '+' {OP_ADD}
 	| '-' {OP_MIN}
 	| '*' {OP_MUL}
 	| '/' {OP_DIV}
 	| '(' {OP_L_BRACKET}
 	| ')' {OP_R_BRACKET}
+	| '<' {print_string ">INF<";OP_INF}
+	| "<=" {print_string ">INFEQ<";OP_INFEQ}
+	| '>' {print_string ">SUP<";OP_SUP}
+	| ">=" {print_string ">SUPEQ<";OP_SUPEQ}
 (* instructions *)
 	| "LOCATE" {LOCATE}
 	| "PRINT" {PRINT}
 	| "SLEEP" {SLEEP}
 	| "DIM" {DIM}
 	| "AS" {AS}
+(* control structure *)
+	| "IF" {print_string ">IF<";IF}
+	| "THEN" {print_string ">THEN<";THEN}
+	| "ELSE" {print_string ">ELSE<";ELSE}
+	| "ELSEIF" {print_string ">ELSEIF<";ELSEIF}
+	| "END IF" {print_string ">END IF<";ENDIF}
 	
 	| var_name as v	{VAR_NAME v}
 	| string as s 	{QUOTED_STRING s}
-	| number as n 	{NUMBER n}
+	| number as n 	{print_string (">number("^n^")<");NUMBER n}
 	
 	| _ as c {CHAR c}
 

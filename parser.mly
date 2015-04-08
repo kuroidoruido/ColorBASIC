@@ -41,13 +41,15 @@ let printf_var varName =
 %token <string> COMMENT, COMMENT_MULTI
 
 %token OP_EQ, OP_ADD, OP_MIN, OP_MUL, OP_DIV
+%token OP_SUP, OP_SUPEQ, OP_INF, OP_INFEQ
 %token OP_L_BRACKET, OP_R_BRACKET
 
 %token LOCATE
 %token PRINT
 %token SLEEP
-%token DIM
-%token AS
+%token DIM, AS
+
+%token IF, THEN, ELSE, ELSEIF, ENDIF
 
 %token T_STRING, T_INTEGER
 
@@ -56,17 +58,17 @@ let printf_var varName =
 %%
 
 main:
-   includes headers insts footers EOF {}
+   includes headers insts footers EOF {print_string ($1^$2^$3^$4)}
 ;
 
 insts:
-    /* empty */ {}
-  | insts inst {print_string ("\t"^$2)}
+    /* empty */ {""}
+  | insts inst {$1^"\t"^$2}
 ;
 
 inst:
 	| end_of_line {$1}
-(* PRINT *)
+/* PRINT */
 	| PRINT print_simple_arg end_of_line {"printf(" ^ $2 ^ ");"^$3}
 	| PRINT VAR_NAME end_of_line {
 		if Hashtbl.mem var_list $2
@@ -75,12 +77,12 @@ inst:
 		else
 			raise (VariableException "No previous declaration of this variable")
 		}
-(* SLEEP *)
+/* SLEEP */
 	| SLEEP end_of_line {"getchar();"^$2}
-(* LOCATE *)
+/* LOCATE */
 	| LOCATE NUMBER COMA NUMBER end_of_line {"system(\"tput cup " ^ $2 ^ " " ^ $4 ^"\");"^$5}
-(* DIM *)
-	(* simple *)
+/* DIM */
+	/* simple */
 	| DIM VAR_NAME AS datatype end_of_line {
 		if Hashtbl.mem var_list $2
 		then
@@ -88,7 +90,7 @@ inst:
 		else Hashtbl.add var_list $2 $4;
 			(dim_to_c_declaration $4 $2)^$5
 		}
-	(* affectation number *)
+	/* affectation number */
 	| DIM VAR_NAME AS datatype OP_EQ expression end_of_line {
 		if Hashtbl.mem var_list $2
 		then
@@ -100,7 +102,7 @@ inst:
 			else
 				raise (VariableException "Incompatible type")
 		}
-	(* affectation string *)
+	/* affectation string */
 	| DIM VAR_NAME AS datatype OP_EQ QUOTED_STRING end_of_line {
 		if Hashtbl.mem var_list $2
 		then
@@ -112,8 +114,8 @@ inst:
 			else
 				raise (VariableException "Incompatible type")
 		}
-(* AFFECTATION *)
-	(* number *)
+/* AFFECTATION */
+	/* number */
 	| VAR_NAME OP_EQ expression end_of_line {
 			if Hashtbl.mem var_list $1
 			then
@@ -125,7 +127,7 @@ inst:
 			else
 				raise (VariableException "No previous declaration of this variable")
 		}
-	(* string *)
+	/* string */
 	| VAR_NAME OP_EQ QUOTED_STRING end_of_line {
 			if Hashtbl.mem var_list $1
 			then
@@ -137,6 +139,12 @@ inst:
 			else
 				raise (VariableException "No previous declaration of this variable")
 		}
+	| IF boolean_expression THEN insts ifelse ENDIF end_of_line {"if("^$2^")\n\t{"^$4^$5^"\t}"^$7}
+
+ifelse:
+	| /*empty*/ {""}
+	| ELSE insts {"\t}\n\telse\n\t{"^$2}
+	| ELSEIF boolean_expression THEN insts ifelse {"\t}\n\telse if("^$2^")\n\t{"^$4^$5}
 
 print_simple_arg:
 	| QUOTED_STRING {$1}
@@ -149,11 +157,22 @@ expression:
 	| OP_L_BRACKET expression OP_R_BRACKET operators expression {"("^$2^")"^$4^$5}
 	| NUMBER operators expression {$1^$2^$3}
 
+boolean_expression:
+	| NUMBER comparison_operator NUMBER {$1^" "^$2^" "^$3}
+	| QUOTED_STRING OP_EQ QUOTED_STRING {$1^" == "^$3}
+
 operators:
 	| OP_ADD		{"+"}
 	| OP_MIN		{"-"}
 	| OP_MUL		{"*"}
 	| OP_DIV		{"/"}
+	
+comparison_operator:
+	| OP_EQ			{"=="}
+	| OP_SUP		{">"}
+	| OP_SUPEQ		{">="}
+	| OP_INF		{"<"}
+	| OP_INFEQ		{"<="}
 
 datatype:
 	| T_STRING {"string"}
@@ -165,10 +184,10 @@ end_of_line:
 	| COMMENT_MULTI EOL {"/* "^$1^"*/\n"}
 
 includes:
-	| {print_string "#include <stdlib.h>\n\n"}
+	| {"#include <stdlib.h>\n\n"}
 	
 headers:
-	| {print_string "void main()\n{\n"}
+	| {"void main()\n{\n"}
 	
 footers:
-	| {print_string "}"}
+	| {"}"}

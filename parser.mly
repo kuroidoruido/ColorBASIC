@@ -159,7 +159,7 @@ expression:
 
 boolean_expression:
 	| NUMBER comparison_operator NUMBER {$1^" "^$2^" "^$3}
-	| QUOTED_STRING OP_EQ QUOTED_STRING {$1^" == "^$3}
+	| QUOTED_STRING OP_EQ QUOTED_STRING {"strcmp("^$1^","^$3^")"}
 
 operators:
 	| OP_ADD		{"+"}

@@ -13,6 +13,11 @@ IF 1 = 2 THEN
 	PRINT "Hello !"
 END IF
 
+'simple = with string
+IF "1" = "2" THEN
+	PRINT "Hello !"
+END IF
+
 'simple multi inst
 IF 1 < 2 THEN
 	PRINT "Hello"

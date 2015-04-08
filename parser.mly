@@ -159,8 +159,25 @@ expression:
 
 boolean_expression:
 	| NUMBER comparison_operator NUMBER {$1^" "^$2^" "^$3}
+	| VAR_NAME comparison_operator NUMBER {$1^" "^$2^" "^$3}
+	| NUMBER comparison_operator VAR_NAME {$1^" "^$2^" "^$3}
+	
 	| QUOTED_STRING OP_EQ QUOTED_STRING {"strcmp("^$1^","^$3^")"}
+	| VAR_NAME OP_EQ QUOTED_STRING {"strcmp("^$1^","^$3^")"}
+	| QUOTED_STRING OP_EQ VAR_NAME {"strcmp("^$1^","^$3^")"}
 
+	| VAR_NAME comparison_operator VAR_NAME {
+		if Hashtbl.find var_list $1 = "string"
+		then
+			if $2 = "==" && Hashtbl.find var_list $1 = "string"
+			then
+				"strcmp("^$1^","^$3^")"
+			else
+				raise (VariableException "Incompatible type for this comparison operator")
+		else
+			$1^" "^$2^" "^$3
+		}
+	
 operators:
 	| OP_ADD		{"+"}
 	| OP_MIN		{"-"}

@@ -1,5 +1,5 @@
-DIM text AS String
-DIM Z AS Integer
+DIM text AS String = "some text"
+DIM Z AS Integer = 2
 DIM X AS Integer'integer declaration
 'DIM X AS Integer' raise an exception
 

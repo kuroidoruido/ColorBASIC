@@ -12,6 +12,7 @@ X = 1 + 1 - 2 * 3 / 4
 X = 1 + 1 - (2 * 3) / 4
 X = 1 + 1 - (2 * 3)
 
+text = "fdfd"
 
 PRINT text
 PRINT X

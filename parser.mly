@@ -6,10 +6,17 @@ Hashtbl.add var_list key value
 Hashtbl.find var_list key
 *)
 
+let dim_to_c_declaration_init basicType varName init=
+	match basicType with
+	| "int"	-> ("int "^varName^" = "^init^";")
+	| "string"	-> ("char* "^varName^" = "^init^";")
+	| _ -> failwith basicType
+;;
+
 let dim_to_c_declaration basicType varName =
 	match basicType with
-	| "int"	-> ("int "^varName^";")
-	| "string"	-> ("char* "^varName^";")
+	| "int"	-> (dim_to_c_declaration_init basicType varName "0")
+	| "string"	-> (dim_to_c_declaration_init basicType varName "\"\"")
 	| _ -> failwith basicType
 ;;
 
@@ -62,11 +69,13 @@ inst:
 	| PRINT print_simple_arg end_of_line {"printf(" ^ $2 ^ ");"^$3}
 	| PRINT VAR_NAME end_of_line {
 		if Hashtbl.mem var_list $2
-		then (printf_var $2)^$3
-		else raise (VariableException "No previous declaration of this variable")
+		then
+			(printf_var $2)^$3
+		else
+			raise (VariableException "No previous declaration of this variable")
 		}
-	| SLEEP end_of_line {"getchar();\n"}
-	| LOCATE NUMBER COMA NUMBER end_of_line {"system(\"tput cup " ^ $2 ^ " " ^ $4 ^"\");\n"}
+	| SLEEP end_of_line {"getchar();"^$2}
+	| LOCATE NUMBER COMA NUMBER end_of_line {"system(\"tput cup " ^ $2 ^ " " ^ $4 ^"\");"^$5}
 	| DIM VAR_NAME AS datatype end_of_line {
 		if Hashtbl.mem var_list $2
 		then
@@ -74,8 +83,27 @@ inst:
 		else Hashtbl.add var_list $2 $4;
 			(dim_to_c_declaration $4 $2)^$5
 		}
-	| VAR_NAME OP_EQ expression {
-			$1^"="^$3
+	| VAR_NAME OP_EQ expression end_of_line {
+			if Hashtbl.mem var_list $1
+			then
+				if Hashtbl.find var_list $1 = "int"
+				then
+					$1^"="^$3^";"^$4
+				else
+					raise (VariableException "Incompatible type")
+			else
+				raise (VariableException "No previous declaration of this variable")
+		}
+	| VAR_NAME OP_EQ QUOTED_STRING end_of_line {
+			if Hashtbl.mem var_list $1
+			then
+				if Hashtbl.find var_list $1 = "string"
+				then
+					$1^"="^$3^";"^$4
+				else
+					raise (VariableException "Incompatible type")
+			else
+				raise (VariableException "No previous declaration of this variable")
 		}
 
 print_simple_arg:

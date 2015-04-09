@@ -32,6 +32,8 @@ test: all
 	@echo -e "\n"
 	./$(EXEC) test/if.bas
 	@echo -e "\n"
+	./$(EXEC) test/while.bas
+	@echo -e "\n"
 
 clean:
 	rm -f *.cm[iox] *.mli *~ .*~

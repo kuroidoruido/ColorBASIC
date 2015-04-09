@@ -50,6 +50,7 @@ let printf_var varName =
 %token DIM, AS
 
 %token IF, THEN, ELSE, ELSEIF, ENDIF
+%token WHILE, WEND
 
 %token T_STRING, T_INTEGER
 
@@ -139,7 +140,12 @@ inst:
 			else
 				raise (VariableException "No previous declaration of this variable")
 		}
+/* CONTROL STRUCTURE */
+	/* if */
 	| IF boolean_expression THEN insts ifelse ENDIF end_of_line {"if("^$2^")\n\t{"^$4^$5^"\t}"^$7}
+	/* while */
+	| WHILE boolean_expression end_of_line insts WEND end_of_line {"while("^$2^")"^$3^"\t{\n"^$4^"\t}"^$6}
+
 
 ifelse:
 	| /*empty*/ {""}
@@ -151,11 +157,11 @@ print_simple_arg:
 	| NUMBER {$1}
 
 expression:
-	| NUMBER {$1}
-	| OP_MIN NUMBER {"-"^$2}
+	| number {$1}
+	| OP_MIN number {"-"^$2}
 	| OP_L_BRACKET expression OP_R_BRACKET {"("^$2^")"}
 	| OP_L_BRACKET expression OP_R_BRACKET operators expression {"("^$2^")"^$4^$5}
-	| NUMBER operators expression {$1^$2^$3}
+	| number operators expression {$1^$2^$3}
 
 boolean_expression:
 	| NUMBER comparison_operator NUMBER {$1^" "^$2^" "^$3}
@@ -190,6 +196,16 @@ comparison_operator:
 	| OP_SUPEQ		{">="}
 	| OP_INF		{"<"}
 	| OP_INFEQ		{"<="}
+
+number:
+	| NUMBER {$1}
+	| VAR_NAME {
+		if Hashtbl.find var_list $1 = "int"
+		then
+			$1
+		else
+			raise (VariableException "Incompatible type for an expression")
+		}
 
 datatype:
 	| T_STRING {"string"}

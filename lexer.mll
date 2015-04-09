@@ -1,6 +1,5 @@
 {
 	open Parser
-
 	let comment_buffer = ref ""
 }
 
@@ -26,17 +25,17 @@ rule main = parse
 	|  "REM" [^'\n']* as c {COMMENT (String.sub c 3 ((String.length c) - 3))}
 	| "/'" {comment_buffer := "";COMMENT_MULTI (comment_multi lexbuf)}
 (* operators *)
-	| '=' {print_string ">EQ<";OP_EQ}
+	| '=' {OP_EQ}
 	| '+' {OP_ADD}
 	| '-' {OP_MIN}
 	| '*' {OP_MUL}
 	| '/' {OP_DIV}
 	| '(' {OP_L_BRACKET}
 	| ')' {OP_R_BRACKET}
-	| '<' {print_string ">INF<";OP_INF}
-	| "<=" {print_string ">INFEQ<";OP_INFEQ}
-	| '>' {print_string ">SUP<";OP_SUP}
-	| ">=" {print_string ">SUPEQ<";OP_SUPEQ}
+	| '<' {OP_INF}
+	| "<=" {OP_INFEQ}
+	| '>' {OP_SUP}
+	| ">=" {OP_SUPEQ}
 (* instructions *)
 	| "LOCATE" {LOCATE}
 	| "PRINT" {PRINT}
@@ -44,16 +43,20 @@ rule main = parse
 	| "DIM" {DIM}
 	| "AS" {AS}
 (* control structure *)
-	| "IF" {print_string ">IF<";IF}
-	| "THEN" {print_string ">THEN<";THEN}
-	| "ELSE" {print_string ">ELSE<";ELSE}
-	| "ELSEIF" {print_string ">ELSEIF<";ELSEIF}
-	| "END IF" {print_string ">END IF<";ENDIF}
-	
+	(* IF *)
+	| "IF" {IF}
+	| "THEN" {THEN}
+	| "ELSE" {ELSE}
+	| "ELSEIF" {ELSEIF}
+	| "END IF" {ENDIF}
+	(* WHILE *)
+	| "WHILE" {WHILE}
+	| "WEND" {WEND}
+(* other basic elements *)
 	| var_name as v	{VAR_NAME v}
 	| string as s 	{QUOTED_STRING s}
-	| number as n 	{print_string (">number("^n^")<");NUMBER n}
-	
+	| number as n 	{NUMBER n}
+
 	| _ as c {CHAR c}
 
 and comment_multi = parse

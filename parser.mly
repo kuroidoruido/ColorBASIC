@@ -41,7 +41,7 @@ let printf_var varName =
 %token <string> COMMENT, COMMENT_MULTI
 
 %token OP_EQ, OP_ADD, OP_MIN, OP_MUL, OP_DIV
-%token OP_SUP, OP_SUPEQ, OP_INF, OP_INFEQ
+%token OP_NOTEQ, OP_SUP, OP_SUPEQ, OP_INF, OP_INFEQ
 %token OP_L_BRACKET, OP_R_BRACKET
 
 %token LOCATE
@@ -192,6 +192,7 @@ operators:
 	
 comparison_operator:
 	| OP_EQ			{"=="}
+	| OP_NOTEQ		{"!="}
 	| OP_SUP		{">"}
 	| OP_SUPEQ		{">="}
 	| OP_INF		{"<"}

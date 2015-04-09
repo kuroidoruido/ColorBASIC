@@ -5,3 +5,7 @@ colorbasic
 lexer.ml
 parser.ml
 *.c
+report/*.aux
+report/*.log
+report/*.out
+report/*.toc

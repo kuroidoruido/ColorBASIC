@@ -17,6 +17,11 @@ IF x = 2 THEN
 	PRINT "Hello !"
 END IF
 
+'simple <>
+IF x <> 2 THEN
+	PRINT "Hello !"
+END IF
+
 'simple = with string
 IF "3" = z THEN
 	PRINT "Hello !"

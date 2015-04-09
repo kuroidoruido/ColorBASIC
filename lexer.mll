@@ -21,37 +21,38 @@ rule main = parse
 	| "String"		{T_STRING}
 	| "Integer"		{T_INTEGER}
 (* comments *)
-	| "'" [^'\n']* as c {COMMENT (String.sub c 1 ((String.length c) - 1))}
-	|  "REM" [^'\n']* as c {COMMENT (String.sub c 3 ((String.length c) - 3))}
-	| "/'" {comment_buffer := "";COMMENT_MULTI (comment_multi lexbuf)}
+	| "'" [^'\n']* as c		{COMMENT (String.sub c 1 ((String.length c) - 1))}
+	|  "REM" [^'\n']* as c	{COMMENT (String.sub c 3 ((String.length c) - 3))}
+	| "/'"					{comment_buffer := "";COMMENT_MULTI (comment_multi lexbuf)}
 (* operators *)
-	| '=' {OP_EQ}
-	| '+' {OP_ADD}
-	| '-' {OP_MIN}
-	| '*' {OP_MUL}
-	| '/' {OP_DIV}
-	| '(' {OP_L_BRACKET}
-	| ')' {OP_R_BRACKET}
-	| '<' {OP_INF}
-	| "<=" {OP_INFEQ}
-	| '>' {OP_SUP}
-	| ">=" {OP_SUPEQ}
+	| '='	{OP_EQ}
+	| '+'	{OP_ADD}
+	| '-'	{OP_MIN}
+	| '*'	{OP_MUL}
+	| '/'	{OP_DIV}
+	| '('	{OP_L_BRACKET}
+	| ')'	{OP_R_BRACKET}
+	| "<>"	{OP_NOTEQ}
+	| '<'	{OP_INF}
+	| "<="	{OP_INFEQ}
+	| '>'	{OP_SUP}
+	| ">="	{OP_SUPEQ}
 (* instructions *)
-	| "LOCATE" {LOCATE}
-	| "PRINT" {PRINT}
-	| "SLEEP" {SLEEP}
-	| "DIM" {DIM}
-	| "AS" {AS}
+	| "LOCATE"	{LOCATE}
+	| "PRINT"	{PRINT}
+	| "SLEEP"	{SLEEP}
+	| "DIM"		{DIM}
+	| "AS"		{AS}
 (* control structure *)
 	(* IF *)
-	| "IF" {IF}
-	| "THEN" {THEN}
-	| "ELSE" {ELSE}
-	| "ELSEIF" {ELSEIF}
-	| "END IF" {ENDIF}
+	| "IF"		{IF}
+	| "THEN"	{THEN}
+	| "ELSE"	{ELSE}
+	| "ELSEIF"	{ELSEIF}
+	| "END IF"	{ENDIF}
 	(* WHILE *)
-	| "WHILE" {WHILE}
-	| "WEND" {WEND}
+	| "WHILE"	{WHILE}
+	| "WEND"	{WEND}
 (* other basic elements *)
 	| var_name as v	{VAR_NAME v}
 	| string as s 	{QUOTED_STRING s}

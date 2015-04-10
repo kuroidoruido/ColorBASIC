@@ -23,8 +23,8 @@ let dim_to_c_declaration basicType varName =
 let printf_var varName =
 	let local varName =
 		match Hashtbl.find var_list varName with
-		| "int" -> ("\"%d\","^varName)
-		| "string" ->("\"%s\","^varName)
+		| "int" -> ("\"%d\\n\","^varName)
+		| "string" ->("\"%s\\n\","^varName)
 		| _ -> failwith varName
 	in "printf("^(local varName)^");"
 ;;
@@ -55,11 +55,11 @@ let printf_var varName =
 %token T_STRING, T_INTEGER
 
 %start main
-%type <unit> main
+%type <string> main
 %%
 
 main:
-   includes headers insts footers EOF {print_string ($1^$2^$3^$4)}
+   includes headers insts footers EOF {$1^$2^$3^$4}
 ;
 
 insts:
@@ -153,8 +153,8 @@ ifelse:
 	| ELSEIF boolean_expression THEN insts ifelse {"\t}\n\telse if("^$2^")\n\t{"^$4^$5}
 
 print_simple_arg:
-	| QUOTED_STRING {$1}
-	| NUMBER {$1}
+	| QUOTED_STRING {"\"%s\\n\","^$1}
+	| NUMBER {"\"%d\\n\","^$1}
 
 expression:
 	| number {$1}
@@ -218,7 +218,7 @@ end_of_line:
 	| COMMENT_MULTI EOL {"/* "^$1^"*/\n"}
 
 includes:
-	| {"#include <stdlib.h>\n\n"}
+	| {"#include <stdlib.h>\n#include <stdio.h>\n\n"}
 	
 headers:
 	| {"void main()\n{\n"}

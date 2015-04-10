@@ -4,8 +4,22 @@
 \usepackage{lmodern}
 \usepackage[a4paper]{geometry}
 \usepackage{babel}
+\usepackage{graphicx}
 \usepackage[linkcolor=black,colorlinks=true,linkbordercolor={0 0 0},urlbordercolor={0 0 0},urlcolor=black]{hyperref}
-
+\usepackage{listings}
+\lstdefinestyle{customstyle}{
+	basicstyle=\footnotesize,
+	breakatwhitespace=false,         
+	breaklines=true,                 
+	captionpos=b,                    
+	keepspaces=true,
+	showspaces=false,
+	showstringspaces=false,
+	showtabs=false,
+	tabsize=4,
+	frame=single, %lines
+}
+\lstset{style=customstyle}
 \title{Compilateur FreeBasic vers C\\\large{Rapport de projet}}
 \author{Anthony Pena}
 \date{10 Avril 2015}
@@ -64,7 +78,7 @@ La boucle while en FreeBasic s'écrit via un "WHILE" suivit d'une condition sous
 
 Afin de tester le bon fonctionnement du compilateur il était indispensable de reconnaître quelques fonctions de base et il a été choisi PRINT, LOCATE et SLEEP.
 
-PRINT se traduit par la fonction printf en C, celle-ci est fonctionnelle mais limité à un seul argument. Il aurait été possible d'accepter plusieurs mais programmer la génération des motifs pour la fonction printf aurait été coûteux en temps et ce n'était pas l'objectif du projet.
+PRINT se traduit par la fonction printf en C, celle-ci est fonctionnelle mais limité à un seul argument. Il aurait été possible d'accepter plusieurs mais programmer la génération des motifs pour la fonction printf aurait été coûteux en temps et ce n'était pas l'objectif du projet. Pour respecter le fonctionnement original du PRINT en FreeBasic, un retour à la ligne est ajouté systématiquement à la fin de chaque printf en C.
 
 LOCATE permet de replacer l'emplacement du curseur. L'intérêt de cette fonction n'est pas importante mais celle-ci est facile à implémenter via un appel système à une fonction bash. L'implémentation de celle-ci de cette façon rend par contre ce code non fonctionnel sur Windows par exemple.
 
@@ -79,17 +93,36 @@ Une expression entière est un calcul qui peut être composé librement d'Intege
 \label{ssec:expr-booleenne}
 
 Une expression booléenne est une suite de sous expression de comparaison qui forme une suite d'élément à valeur booléenne et dont le résultat est booléen aussi. De cette façon, ici il est tenu compte des opérateurs de comparaison classique des entiers (=, <> (en C !=), <, >, <=, >=), pour les chaînes de caractères seul l'égalité est reconnue.
-%, ainsi que des opérateurs booléen (AND, OR, XOR, NOT, EQV)
 
 \part{Fonctionnement Général}
 \section{Utilisation du compilateur}
-% exemple code FreeBasic simple
+À partir d'ici nous allons utiliser le code source FreeBasic d'une petite implémentation de la suite de Fibonacci\footnote{\url{https://fr.wikipedia.org/wiki/Suite_de_Fibonacci}}. Ce programme, présenté dans le Listing \ref{lst:exp-basic}, va afficher les 30 premières itérations (en plus des deux valeurs d'initialisation). La version compilé, via le compilateur développé ici, de ce code est présenté  sans aucune modification dans le Listing \ref{lst:exp-c}.
+
+Comme on peut le voir le code original est bien compilé en code C puis placé dans une fonction main avec les inclusions nécessaires. On remarque aussi l'absence de tabulation dans le contenu du while mais ça n'empêche pas sa lisibilité au vu de la simplicité de l'exemple qui montre tout de même la manipulation des entiers, des chaînes de caractères, du while, du print et des affectations. 
+
+\lstset{language=[Visual]Basic,caption=Exemple de programme en FreeBasic,label=lst:exp-basic}
+\lstinputlisting{res/fibonacci.bas}
+
 % équivalent C
+\lstset{language=C,caption=Exemple compilé en C,label=lst:exp-c}
+\lstinputlisting{res/fibonacci.c}
+
 % exécution
 \section{Arbre syntaxique}
 
+Bien qu'aucune structure de donnée n'est été mis en place pour représenter l'arbre syntaxique dans le code OCaml, l'arbre est bien présent dans la manière dont sont lu les instructions FreeBasic. En effet la génération du code se fait via concaténation et l'écriture dans le fichier se fait d'un coup, avec l'intégralité du code source C. On obtient donc un arbre qui se construit via des concaténations de chaîne.
+
+La Figure \ref{fig:ast} montre une représentation sous forme d'arbre du programme exemple Listing \ref{lst:exp-basic}.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\textwidth]{res/ast.png}
+    \caption{Arbre syntaxique équivalent au programme exemple}
+    \label{fig:ast}
+\end{figure}
+
 \part{Conclusion}
 
-Durant ce projet nous avons pu mettre en pratique les éléments thériques du cours de Compilateur à travers ce mini compilateur. Cela nous a aussi permis de découvrir l'utilisateur de Lex et Yacc à travers leurs implémentations OCamlLex et OCamlYacc.
+Durant ce projet nous avons pu mettre en pratique les éléments théoriques du cours de Compilateur à travers ce mini compilateur. Cela nous a aussi permis de découvrir l'utilisateur de Lex et Yacc à travers leurs implémentations OCamlLex et OCamlYacc.
 
 \end{document}

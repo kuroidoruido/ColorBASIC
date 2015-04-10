@@ -12,8 +12,5 @@ make test
 ```
 ./colorbasic something.bas
 ```
+A file named something.c will be create and it will contain C source code.
 
-# F.A.Q.
-
-**Why "ColorBASIC" ?**
-Why not ? ColorBASIC is pretty cool name.

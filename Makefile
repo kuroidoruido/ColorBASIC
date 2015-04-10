@@ -17,24 +17,23 @@ compile:
 	$(CAMLC) -c lexer.ml
 	$(CAMLC) *.cmo main.ml -o $(EXEC)
 
-test: all
+test: clean_test 
 	./$(EXEC) test/print.bas
-	@echo -e "\n"
 	./$(EXEC) test/two_print.bas
-	@echo -e "\n"
 	./$(EXEC) test/locate.bas
-	@echo -e "\n"
 	./$(EXEC) test/sleep.bas
-	@echo -e "\n"
 	./$(EXEC) test/comment.bas
-	@echo -e "\n"
 	./$(EXEC) test/dim.bas
-	@echo -e "\n"
 	./$(EXEC) test/if.bas
-	@echo -e "\n"
 	./$(EXEC) test/while.bas
-	@echo -e "\n"
+	./$(EXEC) test/fibonacci.bas
 
 clean:
 	rm -f *.cm[iox] *.mli *~ .*~
 	rm -rf lexer.ml parser.ml
+
+clean_test:
+	rm -f test/*.c
+
+clean_all: clean clean_test
+	rm -f ./$(EXEC)
